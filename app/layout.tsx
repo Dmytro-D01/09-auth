@@ -9,6 +9,7 @@ import {
   NOTEHUB_OG_IMAGE,
 } from "@/lib/metadata";
 import "./globals.css";
+import AuthProvider from "@/components/AuthProvider/AuthProvider";
 
 const roboto = Roboto({
   weight: ["400", "500", "700"],
@@ -42,14 +43,16 @@ export default function RootLayout({
         className={`${roboto.variable} ${roboto.className}`}
       >
         <TanStackProvider>
-          <div className="app-wrapper">
-            <Header />
-            <main className="main-content">
-              {children}
-            </main>
-            {modal}
-            <Footer />
-          </div>
+          <AuthProvider>
+            <div className="app-wrapper">
+              <Header />
+              <main className="main-content">
+                {children}
+              </main>
+              {modal}
+              <Footer />
+            </div>
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>
