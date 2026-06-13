@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { fetchNotes } from "@/lib/api/notes";
+import { fetchNotes } from "@/lib/api/clientApi";
 import NoteList from "@/components/NoteList/NoteList";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
@@ -38,11 +38,11 @@ export default function NotesClient({
         tag ?? "all",
       ],
       queryFn: () =>
-        fetchNotes(
+        fetchNotes({
           page,
-          debouncedSearch,
+          search: debouncedSearch,
           tag,
-        ),
+        }),
       placeholderData: (prev) => prev,
       refetchOnMount: false,
     });

@@ -4,7 +4,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import type { Metadata } from "next";
-import { fetchNotes } from "@/lib/api/notes";
+import { fetchNotes } from "@/lib/api/serverApi";
 import {
   NOTEHUB_OG_IMAGE,
   getOpenGraphUrl,
@@ -54,7 +54,7 @@ export default async function FilteredNotesPage({
 
   await queryClient.prefetchQuery({
     queryKey: ["notes", 1, "", tag ?? "all"],
-    queryFn: () => fetchNotes(1, "", tag),
+    queryFn: () => fetchNotes({ page: 1, search: "", tag }),
   });
 
   return (

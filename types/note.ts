@@ -7,8 +7,7 @@ export interface Note {
   updatedAt: string;
 }
 
-export interface CreateNoteData {
-  title: string;
-  content: string;
-  tag: string;
-}
+export type CreateNoteData = Pick<
+  Note,
+  "title" | "content" | "tag"
+>;

@@ -9,7 +9,7 @@ import {
   useMutation,
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { createNote } from "@/lib/api/notes";
+import { createNote } from "@/lib/api/clientApi";
 import { CreateNoteData } from "@/types/note";
 import {
   initialDraft,

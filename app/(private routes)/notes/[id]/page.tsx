@@ -4,7 +4,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import type { Metadata } from "next";
-import { fetchNoteById } from "@/lib/api/notes";
+import { fetchNoteById } from "@/lib/api/serverApi";
 import {
   NOTEHUB_OG_IMAGE,
   getOpenGraphUrl,
