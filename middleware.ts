@@ -2,7 +2,6 @@ import {
   NextRequest,
   NextResponse,
 } from "next/server";
-import { checkSession } from "@/lib/api/serverApi";
 
 const privateRoutes = [
   "/notes",
@@ -13,7 +12,23 @@ const publicRoutes = [
   "/sign-up",
 ];
 
-export async function middleware(
+function isAuthenticated(
+  request: NextRequest,
+): boolean {
+  const accessToken =
+    request.cookies.get(
+      "accessToken",
+    )?.value;
+  const refreshToken =
+    request.cookies.get(
+      "refreshToken",
+    )?.value;
+  return !!(
+    accessToken || refreshToken
+  );
+}
+
+export function middleware(
   request: NextRequest,
 ) {
   const { pathname } = request.nextUrl;
@@ -31,20 +46,16 @@ export async function middleware(
     return NextResponse.next();
   }
 
-  const cookieHeader =
-    request.headers.get("cookie") ?? "";
-  const session = await checkSession(
-    cookieHeader,
-  );
-  const isAuthenticated = !!session;
+  const authenticated =
+    isAuthenticated(request);
 
-  if (isPrivate && !isAuthenticated) {
+  if (isPrivate && !authenticated) {
     return NextResponse.redirect(
       new URL("/sign-in", request.url),
     );
   }
 
-  if (isPublic && isAuthenticated) {
+  if (isPublic && authenticated) {
     return NextResponse.redirect(
       new URL("/profile", request.url),
     );
