@@ -1,6 +1,12 @@
-import apiClient from "./api";
+import axios from "axios";
 import { Note } from "@/types/note";
 import { User } from "@/types/user";
+
+const serverAxios = axios.create({
+  baseURL:
+    "https://notehub-api.goit.study",
+  withCredentials: true,
+});
 
 export interface FetchNotesParams {
   search?: string;
@@ -26,7 +32,7 @@ export async function fetchNotes(
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await apiClient.get<FetchNotesResponse>(
+    await serverAxios.get<FetchNotesResponse>(
       "/notes",
       {
         params: {
@@ -47,7 +53,7 @@ export async function fetchNoteById(
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await apiClient.get<Note>(
+    await serverAxios.get<Note>(
       `/notes/${id}`,
       {
         headers: {
@@ -62,7 +68,7 @@ export async function getMe(): Promise<User> {
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await apiClient.get<User>(
+    await serverAxios.get<User>(
       "/users/me",
       {
         headers: {
@@ -73,8 +79,6 @@ export async function getMe(): Promise<User> {
   return response.data;
 }
 
-// Якщо cookieHeader передано — використовується в middleware.
-// Якщо ні — читає cookies з next/headers (серверні компоненти).
 export async function checkSession(
   cookieHeader?: string,
 ): Promise<User | null> {
@@ -82,19 +86,16 @@ export async function checkSession(
     const cookie =
       cookieHeader ??
       (await getCookieHeader());
-    const baseURL =
-      process.env.NEXT_PUBLIC_API_URL +
-      "/api";
-    const response = await fetch(
-      `${baseURL}/auth/session`,
-      {
-        headers: { Cookie: cookie },
-        cache: "no-store",
-      },
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data?.email ? data : null;
+    const response =
+      await serverAxios.get(
+        "/auth/session",
+        {
+          headers: { Cookie: cookie },
+        },
+      );
+    return response.data?.email
+      ? response.data
+      : null;
   } catch {
     return null;
   }
