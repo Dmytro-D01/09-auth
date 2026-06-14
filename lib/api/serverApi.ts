@@ -1,4 +1,6 @@
-import axios from "axios";
+import axios, {
+  AxiosResponse,
+} from "axios";
 import { Note } from "@/types/note";
 import { User } from "@/types/user";
 
@@ -81,22 +83,16 @@ export async function getMe(): Promise<User> {
 
 export async function checkSession(
   cookieHeader?: string,
-): Promise<User | null> {
-  try {
-    const cookie =
-      cookieHeader ??
-      (await getCookieHeader());
-    const response =
-      await serverAxios.get(
-        "/auth/session",
-        {
-          headers: { Cookie: cookie },
-        },
-      );
-    return response.data?.email
-      ? response.data
-      : null;
-  } catch {
-    return null;
-  }
+): Promise<AxiosResponse> {
+  const cookie =
+    cookieHeader ??
+    (await getCookieHeader());
+  const response =
+    await serverAxios.get(
+      "/auth/session",
+      {
+        headers: { Cookie: cookie },
+      },
+    );
+  return response;
 }

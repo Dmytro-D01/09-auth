@@ -2,6 +2,7 @@ import {
   NextRequest,
   NextResponse,
 } from "next/server";
+import { checkSession } from "@/lib/api/serverApi";
 
 const privateRoutes = [
   "/notes",
@@ -12,23 +13,7 @@ const publicRoutes = [
   "/sign-up",
 ];
 
-function isAuthenticated(
-  request: NextRequest,
-): boolean {
-  const accessToken =
-    request.cookies.get(
-      "accessToken",
-    )?.value;
-  const refreshToken =
-    request.cookies.get(
-      "refreshToken",
-    )?.value;
-  return !!(
-    accessToken || refreshToken
-  );
-}
-
-export function proxy(
+export async function proxy(
   request: NextRequest,
 ) {
   const { pathname } = request.nextUrl;
@@ -46,18 +31,78 @@ export function proxy(
     return NextResponse.next();
   }
 
-  const authenticated =
-    isAuthenticated(request);
+  const accessToken =
+    request.cookies.get(
+      "accessToken",
+    )?.value;
+  const refreshToken =
+    request.cookies.get(
+      "refreshToken",
+    )?.value;
 
-  if (isPrivate && !authenticated) {
-    return NextResponse.redirect(
-      new URL("/sign-in", request.url),
-    );
+  // accessToken є — авторизований
+  if (accessToken) {
+    if (isPublic) {
+      return NextResponse.redirect(
+        new URL(
+          "/profile",
+          request.url,
+        ),
+      );
+    }
+    return NextResponse.next();
   }
 
-  if (isPublic && authenticated) {
+  // Є тільки refreshToken — пробуємо оновити сесію
+  if (refreshToken) {
+    try {
+      const cookieHeader =
+        request.headers.get("cookie") ??
+        "";
+      const sessionResponse =
+        await checkSession(
+          cookieHeader,
+        );
+      const setCookieHeader =
+        sessionResponse.headers[
+          "set-cookie"
+        ];
+
+      const response = isPublic
+        ? NextResponse.redirect(
+            new URL(
+              "/profile",
+              request.url,
+            ),
+          )
+        : NextResponse.next();
+
+      // Якщо отримали нові токени — встановлюємо їх у cookies
+      if (setCookieHeader) {
+        const cookieArray =
+          Array.isArray(setCookieHeader)
+            ? setCookieHeader
+            : [setCookieHeader];
+        cookieArray.forEach(
+          (cookie) => {
+            response.headers.append(
+              "set-cookie",
+              cookie,
+            );
+          },
+        );
+      }
+
+      return response;
+    } catch {
+      // Оновлення сесії не вдалось — не авторизований
+    }
+  }
+
+  // Не авторизований
+  if (isPrivate) {
     return NextResponse.redirect(
-      new URL("/profile", request.url),
+      new URL("/sign-in", request.url),
     );
   }
 
