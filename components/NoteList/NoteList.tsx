@@ -32,7 +32,7 @@ export default function NoteList({
     <ul className={css.list}>
       {notes.map((note) => (
         <li
-          key={note.id}
+          key={note._id}
           className={css.item}
         >
           <div className={css.header}>
@@ -50,7 +50,7 @@ export default function NoteList({
           </p>
           <div className={css.actions}>
             <Link
-              href={`/notes/${note.id}`}
+              href={`/notes/${note._id}`}
               className={css.viewLink}
             >
               View details
@@ -61,7 +61,7 @@ export default function NoteList({
               }
               onClick={() =>
                 deleteMutation.mutate(
-                  note.id,
+                  note._id,
                 )
               }
               disabled={

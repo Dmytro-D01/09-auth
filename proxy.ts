@@ -28,9 +28,7 @@ function isAuthenticated(
   );
 }
 
-export function middleware(
-  request: NextRequest,
-) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPrivate = privateRoutes.some(
