@@ -28,7 +28,9 @@ function isAuthenticated(
   );
 }
 
-export function proxy(request: NextRequest) {
+export function proxy(
+  request: NextRequest,
+) {
   const { pathname } = request.nextUrl;
 
   const isPrivate = privateRoutes.some(
@@ -64,8 +66,8 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/notes/:path*",
-    "/profile/:path*",
+    "/notes(.*)",
+    "/profile(.*)",
     "/sign-in",
     "/sign-up",
   ],
