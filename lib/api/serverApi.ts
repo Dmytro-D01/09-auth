@@ -1,14 +1,7 @@
-import axios, {
-  AxiosResponse,
-} from "axios";
+import apiClient from "./api";
+import { AxiosResponse } from "axios";
 import { Note } from "@/types/note";
 import { User } from "@/types/user";
-
-const serverAxios = axios.create({
-  baseURL:
-    "https://notehub-api.goit.study",
-  withCredentials: true,
-});
 
 export interface FetchNotesParams {
   search?: string;
@@ -34,7 +27,7 @@ export async function fetchNotes(
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await serverAxios.get<FetchNotesResponse>(
+    await apiClient.get<FetchNotesResponse>(
       "/notes",
       {
         params: {
@@ -55,7 +48,7 @@ export async function fetchNoteById(
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await serverAxios.get<Note>(
+    await apiClient.get<Note>(
       `/notes/${id}`,
       {
         headers: {
@@ -70,7 +63,7 @@ export async function getMe(): Promise<User> {
   const cookieHeader =
     await getCookieHeader();
   const response =
-    await serverAxios.get<User>(
+    await apiClient.get<User>(
       "/users/me",
       {
         headers: {
@@ -87,12 +80,11 @@ export async function checkSession(
   const cookie =
     cookieHeader ??
     (await getCookieHeader());
-  const response =
-    await serverAxios.get(
-      "/auth/session",
-      {
-        headers: { Cookie: cookie },
-      },
-    );
+  const response = await apiClient.get(
+    "/auth/session",
+    {
+      headers: { Cookie: cookie },
+    },
+  );
   return response;
 }

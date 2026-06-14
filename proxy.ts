@@ -45,7 +45,7 @@ export async function proxy(
     if (isPublic) {
       return NextResponse.redirect(
         new URL(
-          "/profile",
+          "/",
           request.url,
         ),
       );
